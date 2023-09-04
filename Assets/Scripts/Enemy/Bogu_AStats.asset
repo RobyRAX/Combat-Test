@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06f6086a743a18c46a85ae76735afa4f, type: 3}
+  m_Name: Bogu_AStats
+  m_EditorClassIdentifier: 
+  enemyName: Bogu_TypeA
+  Stats:
+  - Level: 1
+    MaxHp: 25
+    Damage: 7.5
+    MovementSpeed: 2
+    ExpDropped: 15
+  - Level: 2
+    MaxHp: 40
+    Damage: 9
+    MovementSpeed: 2.5
+    ExpDropped: 20
+  - Level: 3
+    MaxHp: 65
+    Damage: 12
+    MovementSpeed: 3
+    ExpDropped: 25
+  - Level: 4
+    MaxHp: 65
+    Damage: 12
+    MovementSpeed: 3.5
+    ExpDropped: 30
+  - Level: 5
+    MaxHp: 85
+    Damage: 15
+    MovementSpeed: 4
+    ExpDropped: 35

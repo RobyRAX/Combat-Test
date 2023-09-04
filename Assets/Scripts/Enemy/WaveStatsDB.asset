@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c3f6edc773a3247b792d2d56c470bd, type: 3}
+  m_Name: WaveStatsDB
+  m_EditorClassIdentifier: 
+  Stats:
+  - wave: 1
+    enemyPerWave: 5
+    maxCurrentEnemy: 2
+    spawnDelay: 1
+  - wave: 2
+    enemyPerWave: 10
+    maxCurrentEnemy: 3
+    spawnDelay: 1
+  - wave: 3
+    enemyPerWave: 15
+    maxCurrentEnemy: 4
+    spawnDelay: 1
+  - wave: 4
+    enemyPerWave: 20
+    maxCurrentEnemy: 5
+    spawnDelay: 1.25
+  - wave: 5
+    enemyPerWave: 20
+    maxCurrentEnemy: 6
+    spawnDelay: 1.25
