@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
-
 public class CharController : MonoBehaviour
 {
     public static event Action<GameObject, float> OnPlayerGiveDamage;
@@ -13,6 +11,7 @@ public class CharController : MonoBehaviour
     public static event Action<float, float> OnExpChange;
     public static event Action<int, bool> OnLevelUp;
     public static event Action OnPlayerDead;
+    public static event Action<float> OnSkillCDMin;
 
     [Serializable]
     public struct ComboParameter
@@ -66,13 +65,34 @@ public class CharController : MonoBehaviour
     float _comboStepDelay;
     int _comboStep;
 
+    [Header("Skill Parameter")]
+    [SerializeField] float skillDuration;
+    public GameObject slashPrefab;
+    [SerializeField] Transform splashSpawnPoint;
+    [SerializeField] float skilStepDistance;
+    [SerializeField] float slashSpeed;
+    [SerializeField] float skillCD;
+    [SerializeField] float cdTimerStep;
+    float _skillCD;
+    public float SkillCD
+    {
+        get { return _skillCD; }
+        set
+        {
+            _skillCD = value;
+            OnSkillCDMin(_skillCD);
+        }
+    }
+
     Vector2 inputValue;
     bool isDash;
     bool isMove;
     bool isAttack;
-    bool isStep;
-    bool canAttack = true;
+    bool isStep;    
     bool isDead;
+    bool isSkill;
+    bool canAttack = true;
+    bool canSkill = true;
 
     PlayerInputAction playerInput;
     Rigidbody rb;
@@ -83,10 +103,11 @@ public class CharController : MonoBehaviour
     {
         playerInput = new PlayerInputAction();
         playerInput.Enable();
-        playerInput.Char.Dash.performed += DashPerformedHandler;
+        playerInput.Char.Dash.performed += DashHandler;
         playerInput.Char.Movement.performed += MovementHandler;
         playerInput.Char.Movement.canceled += MovementHandler;
-        playerInput.Char.Attack.performed += AttackHandler;       
+        playerInput.Char.Attack.performed += AttackHandler;
+        playerInput.Char.Skill.performed += SkillHandler;
 
         GameManager.OnGameStateChange += GameStateChangeHandler;
 
@@ -102,6 +123,7 @@ public class CharController : MonoBehaviour
             SetCurrentStats();
 
             CurrentEXP = 0.0f;
+            SkillCD = 0.0f;
         }
     }
 
@@ -121,7 +143,8 @@ public class CharController : MonoBehaviour
         if(!isDead)
         {
             Walk();
-            AttackDelay();
+            AttacStep();
+            SkillStep();
         }
         
     }
@@ -235,7 +258,7 @@ public class CharController : MonoBehaviour
         }
     }
 
-    void AttackDelay()
+    void AttacStep()
     {
         anim.SetBool("IsAttack", isAttack);
 
@@ -341,7 +364,7 @@ public class CharController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, rotationTarget, 35 * Time.deltaTime);
         }
         
-        if (isMove && !isDash && !isAttack)
+        if (isMove && !isDash && !isAttack && !isSkill)
         {           
             transform.Translate(Vector3.forward * currentStat.MovementSpeed * Time.deltaTime);
         }    
@@ -361,9 +384,9 @@ public class CharController : MonoBehaviour
         anim.SetBool("IsMove", isMove);
     }
 
-    void DashPerformedHandler(InputAction.CallbackContext context)
+    void DashHandler(InputAction.CallbackContext context)
     {
-        if(!isDash)
+        if(!isDash && !isSkill)
         {
             //RESET COMBO
             canAttack = true;
@@ -379,16 +402,82 @@ public class CharController : MonoBehaviour
     private IEnumerator DashCo()
     {
         isDash = true;
-        if(isDash)
+        if (isDash)
         {
             Vector3 dashDirection = transform.forward; // Dash in the direction the player is facing
             Vector3 dashVelocity = dashDirection * (dashDistance / dashDuration);
             rb.velocity = dashVelocity;
         }
-        
+
         yield return new WaitForSeconds(dashDuration);
 
         rb.velocity = Vector3.zero;
         isDash = false;
+    }
+
+    void SkillHandler(InputAction.CallbackContext context)
+    {
+        if (!isSkill && !isDash && canSkill)
+        {
+            //RESET COMBO
+            canAttack = true;
+            isAttack = false;
+            _comboStep = 0;
+
+            StartCoroutine(SkillCo());
+            StartCoroutine(SkillCooldownCo());
+            anim.SetTrigger("IsSkill");
+        }
+    }
+
+    IEnumerator SkillCooldownCo()
+    {
+        canSkill = false;
+        SkillCD = skillCD;
+
+        while(SkillCD > 0)
+        {
+            yield return new WaitForSeconds(cdTimerStep);
+            SkillCD -= cdTimerStep;
+        }
+
+        canSkill = true;
+    }
+
+    IEnumerator SkillCo()
+    {
+        isSkill = true;
+
+        yield return new WaitForSeconds(skillDuration);
+
+        isSkill = false;
+    }
+
+    void SkillStep()
+    {
+        if(isSkill)
+        {
+            if (isStep)
+            {
+                transform.Translate(Vector3.forward * skilStepDistance * Time.deltaTime);               
+            }
+        }        
+    }
+
+    public void SpawnSlash(int slashStep)
+    {
+        GameObject slash = Instantiate(slashPrefab, splashSpawnPoint.position, splashSpawnPoint.rotation);
+        if(slashStep == 0)
+        {
+            slash.transform.Rotate(new Vector3(0, 0, 45));
+            slash.GetComponent<SkillCollider>().Speed = slashSpeed;
+            slash.GetComponent<SkillCollider>().Damage = currentStat.Damage * 1.5f;
+        }
+        else if(slashStep == 1)
+        {
+            slash.transform.Rotate(new Vector3(0, 0, -45));
+            slash.GetComponent<SkillCollider>().Speed = slashSpeed;
+            slash.GetComponent<SkillCollider>().Damage = currentStat.Damage * 1.5f;
+        }
     }
 }

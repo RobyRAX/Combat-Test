@@ -57,11 +57,13 @@ public class EnemyBase : MonoBehaviour
     private void Awake()
     {
         CharController.OnPlayerGiveDamage += ReceiveDamage;
+        SkillCollider.OnGiveDamage += ReceiveDamage;
     }
 
     private void OnDestroy()
     {
         CharController.OnPlayerGiveDamage -= ReceiveDamage;
+        SkillCollider.OnGiveDamage -= ReceiveDamage;
     }
 
     private void ReceiveDamage(GameObject enemy, float damage)
@@ -230,7 +232,7 @@ public class EnemyBase : MonoBehaviour
         else
         {
             expDrop.GetComponent<EXPDrop>().EXP = stat.ExpDropped;
-            expDrop.transform.localScale /= 1.5f;
+            expDrop.transform.localScale *= 0.75f;
         }
 
     }

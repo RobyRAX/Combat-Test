@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI ExpText;
     public TextMeshProUGUI LevelText;
     public TextMeshProUGUI WaveText;
+    public TextMeshProUGUI SkillCdText;
 
     [Header("Upgrade")]
     public TextMeshProUGUI upgradeNotif;
@@ -39,6 +40,7 @@ public class UIManager : MonoBehaviour
         CharController.OnLevelUp += LevelChangeHandler;
         EnemySpawner.OnWaveChange += WaveChangeHandler;
         UpgradeManager.OnUpgradePointChange += UpgradePointChangeHandler;
+        CharController.OnSkillCDMin += SkillCDHandler;
     }
 
     void GameStateChangeHandler(GameState state)
@@ -83,5 +85,13 @@ public class UIManager : MonoBehaviour
     void UpgradePointChangeHandler(int point)
     {
         upgradeNotif.gameObject.SetActive(point > 0);
+    }
+
+    void SkillCDHandler(float timer)
+    {
+        if (timer > 0)
+            SkillCdText.text = timer.ToString("F1");
+        else
+            SkillCdText.text = "Ready!";
     }
 }
