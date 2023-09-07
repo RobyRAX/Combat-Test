@@ -317,7 +317,9 @@ public class CharController : MonoBehaviour
             float currentAngle = t * (rayAngle / 2) * Mathf.Deg2Rad;
             Vector3 rayDirection = Quaternion.Euler(0f, currentAngle * Mathf.Rad2Deg, 0f) * transform.forward;
 
-            Debug.DrawLine(transform.position + rayOffset, (transform.position + rayOffset) + rayDirection * rayDistance, Color.green);
+            Debug.DrawLine(transform.position + rayOffset, 
+                            (transform.position + rayOffset) + rayDirection * rayDistance, 
+                            Color.green);
 
             RaycastHit hit;
             if (Physics.Raycast(transform.position + rayOffset, rayDirection, out hit, rayDistance))
